@@ -1,4 +1,6 @@
 
+
+
 /*We created this generic class in order to represent our sensor data as objects of a class. Doing it this way
  * we can have both sensor value and the time stamp that we received this specific value 
  */

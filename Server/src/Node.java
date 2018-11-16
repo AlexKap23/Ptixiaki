@@ -1,3 +1,5 @@
+
+
 /*This class represents a node of the chain we are going to use
  * in order for our system to use probabilities and learn paterns 
  * from users.There are two different constructors each of them for

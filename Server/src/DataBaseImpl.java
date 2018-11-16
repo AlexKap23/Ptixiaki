@@ -1,3 +1,4 @@
+
 /*This is the actual database implementation class. It contains methods to start from scratch the database
  * and insert values into tables. It also has a method for running queries 
  * to the database. This is being used in order for us to
@@ -10,13 +11,17 @@ public class DataBaseImpl implements DataBase{
 
 	
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://localhost:3306/";
+	static final String DB_URL = "jdbc:mysql://localhost:3306/sensors_data?autoReconnect=true&useSSL=false";
 
 	private static final String USER = "root";
-	private static final String PASS = "password";
+	private static final String PASS = "s1pte6wcc";
 
 	static Connection conn = null;
 	static Statement stmt = null;
+	
+	public void DataBaseImpl(){
+		
+	}
 	
 	public void createDb(){
 		try{
@@ -94,7 +99,7 @@ public class DataBaseImpl implements DataBase{
 			stmt = conn.createStatement();
 			
 			String insert = "INSERT INTO SENSORS_DATA.Temperature" + "(value,date,time) " + "VALUES ( " + value + " ," + date+" ," + time+" );";
-			stmt.executeQuery(insert);
+			stmt.executeUpdate(insert);
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
@@ -121,7 +126,7 @@ public class DataBaseImpl implements DataBase{
 			stmt = conn.createStatement();
 			
 			String insert = "INSERT INTO SESNORS_DATA.Motion" + "(motion,date,time) " + "VALUES ( " + motion + " ," + date+" ," + time+" );";
-			stmt.executeQuery(insert);
+			stmt.executeUpdate(insert);
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
@@ -141,17 +146,45 @@ public class DataBaseImpl implements DataBase{
 	}
 	
 	
-	public ResultSet fetchFromBd(String query){
+	public String fetchFromBd(String query) {
 		
 		ResultSet rs = null;
+		String result = "";
 		try {
-			Statement stmt = conn.createStatement();
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNumber = rsmd.getColumnCount();
+			while (rs.next()) {
+			    for (int i = 1; i <= columnsNumber; i++) {
+			        if (i > 1) System.out.print(",  ");
+			        result += rs.getString(i);
+			        
+			    }
+			   
+			}
 		} catch (SQLException e) {
 			System.out.println("An exception happened while running a query");
 			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException se2) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
 		}
-		return rs;
+		return result;
 	}
 	
 

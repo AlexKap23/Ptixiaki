@@ -1,3 +1,5 @@
+
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -15,6 +17,6 @@ public interface DataBase {
 	abstract void insertMotion(String motion,String date,String time);
 	
 	//method that runs a query into the database
-	abstract ResultSet fetchFromBd(String query);
+	abstract String fetchFromBd(String query);
 	
 }
