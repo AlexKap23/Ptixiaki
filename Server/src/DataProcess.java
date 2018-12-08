@@ -1,5 +1,8 @@
 
 
+import Model.MotionSensor;
+import Model.TemperatureSensor;
+
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,9 +12,10 @@ import java.util.Queue;
 public class DataProcess implements Runnable {
 	private String topic; //this is used to help us use more threads for more jobs
 	private String value;
+	private String name;
 	private Date date;
-	protected static Queue<SensorData> tempData = new LinkedList<SensorData>();
-	protected static Queue<SensorData> motionData = new LinkedList<SensorData>();
+	protected static Queue<TemperatureSensor> tempData = new LinkedList<TemperatureSensor>();
+	protected static Queue<MotionSensor> motionData = new LinkedList<MotionSensor>();
 	private static Chain tempChain ;
 	private static Chain motionChain;
 	
@@ -26,6 +30,7 @@ public class DataProcess implements Runnable {
 		this.topic = topic;
 		this.value = value;
 		this.date = date;
+		this.name = name;
 		this.tempChain = tempChain;
 		this.motionChain = motionChain;
 	}
@@ -57,17 +62,30 @@ public class DataProcess implements Runnable {
 	public Date getDate(){
 		return date;
 	}
-	
-	
-	/*updating the queue that holds temperature data. Every time a new temperature item comes
-	 the queue has to be updated. We remove the peek element and add the new one at the tail*/
-	protected Queue<SensorData> tempUpdate(Queue<SensorData> tempData,String newTempValue){
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    /*updating the queue that holds temperature data. Every time a new temperature item comes
+             the queue has to be updated. We remove the peek element and add the new one at the tail*/
+	protected Queue<TemperatureSensor> tempUpdate(Queue<TemperatureSensor> tempData,String newTempValue,String name){
 		//date = new Date();
 		double temp = Double.valueOf(newTempValue); //casting string to double
-		
-		
-		SensorData sd = new SensorData(temp,date);
-		tempData.add(sd);
+		TemperatureSensor tempValue = new TemperatureSensor(name,date,temp);
+		tempData.add(tempValue);
 		if(tempData.size()>=2400){
 			tempData.remove();//removes the head of the queue	
 		}
@@ -88,10 +106,11 @@ public class DataProcess implements Runnable {
 	}
 	
 	/*Updating the queue that holds motion sensor values. Motion is either yes or no*/
-	protected Queue<SensorData> motionUpdate(Queue<SensorData> motionData,String newMotionValue){
-		//date = new Date();
-		SensorData sd = new SensorData(newMotionValue,date);
-		motionData.add(sd);
+	protected Queue<MotionSensor> motionUpdate(Queue<MotionSensor> motionData, String newMotionValue,String name){
+	    boolean motionValueAsBool = false;
+        motionValueAsBool = (newMotionValue=="true")?true:false;
+		MotionSensor motionValue = new MotionSensor(name,date,motionValueAsBool);
+		motionData.add(motionValue);
 		if(motionData.size()>=2400){
 			motionData.remove();//removes the head of the queue	
 		}
@@ -106,18 +125,18 @@ public class DataProcess implements Runnable {
 			//call tempUpdate with the right arguments
 			//update database
 			//compute probabilities
-			tempUpdate(tempData,this.value);
+			tempUpdate(tempData,getValue(),getName());
 			insert2DataBase();
 			tempChain.populateTransitionTable(queryForProbability,queryForAll);  //
-			System.out.println(tempData.element().getT()+" Size= "+ tempData.size()); //debug message
+			System.out.println(tempData.element().getTempValue()+" Size= "+ tempData.size()); //debug message
 		}else if(topic.equals("motion")){
 			//call motionUpdate with right arguments
 			//update database
 			//compute probabilities
-			motionUpdate(motionData,this.value);
+			motionUpdate(motionData,getValue(),getName());
 			insert2DataBase();
 			motionChain.populateTransitionTable(queryForProbability,queryForAll);  //
-			System.out.println(motionData.element().getT()+" Size= "+ motionData.size()); //debug message
+			System.out.println(motionData.element().isMotion()+" Size= "+ motionData.size()); //debug message
 		}else {
 		
 			System.out.println("An error occured. Terminating....");
