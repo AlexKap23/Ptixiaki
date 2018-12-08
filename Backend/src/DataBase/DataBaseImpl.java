@@ -4,7 +4,7 @@
  * to the database. This is being used in order for us to
  * calculate probability values and populate those into our transition tables.
  * */
-
+package DataBase;
 import java.sql.*;
 import java.util.ArrayList;
 public class DataBaseImpl implements DataBase{

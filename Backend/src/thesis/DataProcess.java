@@ -1,5 +1,6 @@
 package thesis;
 
+import DataBase.DataBaseImpl;
 import Model.MotionSensor;
 import Model.TemperatureSensor;
 

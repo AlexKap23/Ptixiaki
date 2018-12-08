@@ -1,3 +1,4 @@
+package FirebaseNotification;
 import com.google.gson.annotations.SerializedName;
 
 import javax.annotation.Generated;
