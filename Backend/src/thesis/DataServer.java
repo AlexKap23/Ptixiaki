@@ -1,4 +1,5 @@
-
+import FirebaseNotification.NotificationRequestToFireBase;
+import thesis.DataProcess;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -24,9 +25,9 @@ public class DataServer {
       	ExecutorService executor = Executors.newFixedThreadPool(5);
       	int i=0;
         try {
-            if(i==0){
+            /*if(i==0){
                NotificationRequestToFireBase.sendRequest();
-            }
+            }*/
             while (true) {
                 Socket socket = listener.accept();
                 try {
